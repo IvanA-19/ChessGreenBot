@@ -1,4 +1,4 @@
-from config import *
+from config import api_token
 from bot import Bot
 
 

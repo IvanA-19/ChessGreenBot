@@ -36,7 +36,7 @@ class DbHandler:
             return True
         return False
 
-    def check_task(self, user_id):
+    def check_task(self, user_id: int | str) -> int | None:
         self.cursor.execute(f"SELECT * FROM answers WHERE user_id={user_id}")
         data = self.cursor.fetchall()[0]
         for i in range(len(data)):
