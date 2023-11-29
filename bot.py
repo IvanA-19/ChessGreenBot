@@ -245,7 +245,7 @@ class Bot(DbHandler, TeleBot):
             elif call.data == 'next2':
                 keyboard = get_inline_keyboard(['Q:c3', 'Rf6', 'Re4'], [f'var_3_{i}' for i in range(3)])
                 bot.delete_message(call.message.chat.id, call.message.id)
-                file = open("static/images/386ac5490fad73700a675e3c89340a5a.jpeg", 'rb')
+                file = open("static/images/task3.jpeg", 'rb')
                 self.send_action(call.message.chat.id, bot_chat_actions['photo'], time=2)
                 bot.send_photo(call.message.chat.id, file, "Поставьте мат в один ход")
                 self.send_action(call.message.chat.id, bot_chat_actions['text'], time=2)
@@ -316,7 +316,7 @@ class Bot(DbHandler, TeleBot):
 
             elif call.data == 'next7':
                 keyboard = get_inline_keyboard(['Выиграно', 'Ничья'], [f'var_8_{i}' for i in range(2)])
-                file = open("static/images/Снимок экрана от 2023-11-29 23-28-28.png", "rb")
+                file = open("static/images/task8.png", "rb")
                 bot.delete_message(call.message.chat.id, call.message.id)
                 self.send_action(call.message.chat.id, bot_chat_actions['photo'])
                 bot.send_photo(call.message.chat.id, file)
@@ -418,7 +418,7 @@ class Bot(DbHandler, TeleBot):
             elif call.data == 'next14':
                 keyboard = get_inline_keyboard(['Qf4', 'Qc7', 'Rc7'], [f'var_015_{i}' for i in range(3)])
                 bot.delete_message(call.message.chat.id, call.message.id)
-                file = open("static/images/1610903810_zarjadka-dlja-vashego-uma-krasivaja-zadacha-na-mat-v-1-hod.jpg",
+                file = open("static/images/task3.jpeg",
                             'rb')
                 self.send_action(call.message.chat.id, bot_chat_actions['photo'], time=2)
                 bot.send_photo(call.message.chat.id, file, "Поставьте мат в один ход")
