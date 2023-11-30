@@ -30,8 +30,8 @@ class Bot(DbHandler, TeleBot):
             else:
                 if self.check_task(user_id) is not None:
                     keyboard.add(KeyboardButton("Продолжить"))
-            keyboard.add(KeyboardButton('Помощь'), KeyboardButton('Поддержка'))
-            keyboard.add(KeyboardButton('Информация'), KeyboardButton('Выход'))
+            keyboard.add(KeyboardButton('Помощь \U00002753'), KeyboardButton('Поддержка \U0001F4E0'))
+            keyboard.add(KeyboardButton('Информация \U0001F4C3'), KeyboardButton('Выход \U0001F4A4'))
             return keyboard
         for button in keyboard_buttons:
             keyboard.add(KeyboardButton(button))
@@ -51,7 +51,7 @@ class Bot(DbHandler, TeleBot):
                 user_name += f" {message.from_user.last_name}"
             self.send_action(message.chat.id, bot_chat_actions['text'])
             keyboard = self.get_reply_keyboard(['Меню'])
-            bot.send_message(message.chat.id, f"Рады приветствовать, {user_name}!", reply_markup=keyboard)
+            bot.send_message(message.chat.id, f"\U0001F451 Здравствуйте, {user_name}! \U0001F451", reply_markup=keyboard)
 
         @bot.message_handler(commands=['help'])
         def send_help_list(message):
@@ -74,14 +74,15 @@ class Bot(DbHandler, TeleBot):
         def get_info(message):
             keyboard = self.get_reply_keyboard(['Меню'])
             self.send_action(message.chat.id, bot_chat_actions['text'])
-            bot.send_message(message.chat.id, "Информация: ", reply_markup=keyboard)
+            bot.send_message(message.chat.id, f"Информация: \n\n{info}", reply_markup=keyboard)
 
         @bot.message_handler(commands=['instructions'])
         def get_instructions(message):
             if self.check_user(message.from_user.id):
                 keyboard = self.get_reply_keyboard(['Приступить к заданиям'])
                 self.send_action(message.chat.id, bot_chat_actions['text'], time=4)
-                bot.send_message(message.chat.id, "Инструкции: ", reply_markup=keyboard)
+                bot.send_message(message.chat.id, f"Инструкции по выполнению заданий: \n\n{instructions}",
+                                 reply_markup=keyboard)
             else:
                 keyboard = self.get_reply_keyboard(menu=True, user_id=message.from_user.id)
                 self.send_action(message.chat.id, bot_chat_actions['text'])
@@ -101,14 +102,17 @@ class Bot(DbHandler, TeleBot):
                 bot.send_message(message.chat.id, "Вы готовы продолжить выполнение заданий?", reply_markup=keyboard)
             else:
                 self.send_action(message.chat.id, bot_chat_actions['text'])
-                bot.send_message(message.chat.id, "Вы уже ответили на все вопросы, ожидайте результатов.")
+                bot.send_message(message.chat.id, f"Вы уже ответили на все вопросы. "
+                                                  f"{self.get_results(message.from_user.id)}\U0001F60A")
 
         @bot.message_handler(commands=['register'])
         def register(message):
             self.send_action(message.chat.id, bot_chat_actions['text'])
-            bot.send_message(message.chat.id, "Пожалуйста, введите ваши данные: имя, фамилию, email и "
-                                              "номер телефона в следующем формате\n\n"
-                                              "Reg: Имя Фамилия Email Номер телефона")
+            bot.send_message(message.chat.id, "Пожалуйста, введите ваши данные: имя, фамилию, email,"
+                                              "номер телефона, дату рождения и учебное заведение"
+                                              " в следующем формате\n\n"
+                                              "Reg, Имя, Фамилия, Email, Номер телефона, "
+                                              "Дата рождения, Учебное заведение")
 
         @bot.message_handler(commands=['exit'])
         def exit_from_bot(message):
@@ -128,14 +132,17 @@ class Bot(DbHandler, TeleBot):
                 bot.send_message(message.chat.id, "Выберите, что вы хотите сделать", reply_markup=keyboard)
             elif message.text.lower() == 'регистрация':
                 self.send_action(message.chat.id, bot_chat_actions['text'])
-                bot.send_message(message.chat.id, "Пожалуйста, введите ваши данные: имя, фамилию, email и "
-                                                  "номер телефона в следующем формате\n\n"
-                                                  "Reg: Имя Фамилия Email Номер телефона")
-            elif 'reg:' in message.text.lower():
-                user_data = list(message.text.split(' '))
+                bot.send_message(message.chat.id, "Пожалуйста, введите ваши данные: имя, фамилию, email,"
+                                                  "номер телефона, дату рождения и учебное заведение"
+                                                  " в следующем формате\n\n"
+                                                  "Reg, Имя, Фамилия, Email, Номер телефона, "
+                                                  "Дата рождения, Учебное заведение")
+            elif 'reg' in message.text.lower():
+                user_data = list(message.text.split(','))
                 user_data.pop(0)
                 user_data.append(message.from_user.id)
-                if user_data and len(user_data) == 5:
+                print(user_data, len(user_data))
+                if user_data and len(user_data) == 7:
                     keyboard = self.get_reply_keyboard(['Инструкции'])
                     message_text = self.write_user_data(user_data)
                     self.send_action(message.chat.id, bot_chat_actions['text'], time=1)
@@ -146,33 +153,40 @@ class Bot(DbHandler, TeleBot):
                     bot.send_message(message.chat.id, "Что-то пошло не так. Пожалуйста, попробуйте еще раз или "
                                                       "обратитесь в поддержку",
                                      reply_markup=keyboard)
-            elif message.text.lower() == "выход":
+
+            elif message.text.lower() == "выход \U0001F4A4":
                 keyboard = self.get_reply_keyboard(['Меню'])
                 self.send_action(message.chat.id, bot_chat_actions['text'])
                 bot.send_message(message.chat.id, "До свидания!", reply_markup=keyboard)
-            elif message.text.lower() == "поддержка":
+
+            elif message.text.lower() == "поддержка \U0001F4E0":
                 keyboard = self.get_reply_keyboard(["Меню"])
                 self.send_action(message.chat.id, bot_chat_actions['text'])
                 bot.send_message(message.chat.id, "Вы можете написать свой вопрос на электронную почту: "
                                                   "alekseev.i260303@gmail.com или в телеграм: https://t.me/Vanyok77797",
                                  reply_markup=keyboard)
-            elif message.text.lower() == "помощь":
+
+            elif message.text.lower() == "помощь \U00002753":
                 keyboard = self.get_reply_keyboard(['Меню'])
                 self.send_action(message.chat.id, bot_chat_actions['text'])
                 bot.send_message(message.chat.id, f"Список доступных команд:{help_list}", reply_markup=keyboard)
-            elif message.text.lower() == "информация":
+
+            elif message.text.lower() == "информация \U0001F4C3":
                 keyboard = self.get_reply_keyboard(['Меню'])
                 self.send_action(message.chat.id, bot_chat_actions['text'])
-                bot.send_message(message.chat.id, "Информация: ", reply_markup=keyboard)
+                bot.send_message(message.chat.id, f"Информация: \n\n{info}", reply_markup=keyboard)
+
             elif message.text.lower() == 'инструкции':
                 if self.check_user(message.from_user.id):
                     keyboard = self.get_reply_keyboard(['Приступить к заданиям'])
                     self.send_action(message.chat.id, bot_chat_actions['text'], time=4)
-                    bot.send_message(message.chat.id, "Инструкции: ", reply_markup=keyboard)
+                    bot.send_message(message.chat.id, f"Инструкции по выполнению заданий: \n\n{instructions}",
+                                     reply_markup=keyboard)
                 else:
                     keyboard = self.get_reply_keyboard(menu=True, user_id=message.from_user.id)
                     self.send_action(message.chat.id, bot_chat_actions['text'])
                     bot.send_message(message.chat.id, "Пожалуйста, зарегистрируйтесь", reply_markup=keyboard)
+
             elif message.text.lower() == "продолжить":
                 if self.check_task(message.from_user.id) is not None and self.check_task(message.from_user.id) - 1 != 0:
                     keyboard = get_inline_keyboard(['Продолжить'],
@@ -186,12 +200,14 @@ class Bot(DbHandler, TeleBot):
                     bot.send_message(message.chat.id, "Вы готовы продолжить выполнение заданий?", reply_markup=keyboard)
                 else:
                     self.send_action(message.chat.id, bot_chat_actions['text'])
-                    bot.send_message(message.chat.id, "Вы уже ответили на все вопросы, ожидайте результатов.")
+                    bot.send_message(message.chat.id, f"Вы уже ответили на все вопросы."
+                                                      "{self.get_results(message.from_user.id)}\U0001F60A")
+
             elif message.text.lower() == 'приступить к заданиям':
                 if self.check_user(message.from_user.id):
                     keyboard = get_inline_keyboard(['Начать'], ['start'])
                     self.send_action(message.chat.id, bot_chat_actions['text'], time=1)
-                    bot.send_message(message.chat.id, "Желаем удачи!", reply_markup=keyboard)
+                    bot.send_message(message.chat.id, "Желаем удачи! \U0001F3C5", reply_markup=keyboard)
                 else:
                     keyboard = self.get_reply_keyboard(menu=True, user_id=message.from_user.id)
                     self.send_action(message.chat.id, bot_chat_actions['text'])
@@ -206,8 +222,7 @@ class Bot(DbHandler, TeleBot):
         окончания. При начале выполнения задач мы фиксируем дату и время, заносим в БД. Далее сообщаем
         участнику, сколько времени у него осталось на выполнение, а также напоминаем про это при каждом взаимодействии
         с ботом. Проверку построим на основании модуля datetime и будем вычислять несложным путем. 
-        Разработать систему команд, прописать всю необходимую информацию, сделать оформление.  Предусмотреть 
-        возможность узнать, сколько осталось времени. Протестировать бота, после разместить его на хостинге.
+        Прописать всю необходимую информацию, сделать оформление. Протестировать бота, после разместить его на хостинге.
                                                 
                                                 !!!!!    ТЗ    !!!!!
         """
@@ -247,9 +262,7 @@ class Bot(DbHandler, TeleBot):
                 bot.delete_message(call.message.chat.id, call.message.id)
                 file = open("static/images/task3.jpeg", 'rb')
                 self.send_action(call.message.chat.id, bot_chat_actions['photo'], time=2)
-                bot.send_photo(call.message.chat.id, file, "Поставьте мат в один ход")
-                self.send_action(call.message.chat.id, bot_chat_actions['text'], time=2)
-                bot.send_message(call.message.chat.id, "Ваш ответ: ", reply_markup=keyboard)
+                bot.send_photo(call.message.chat.id, file, "Поставьте мат в один ход", reply_markup=keyboard)
             elif 'var_3' in call.data:
                 text = ""
                 for i in range(3):
@@ -257,7 +270,8 @@ class Bot(DbHandler, TeleBot):
                         text = str(i)
                 keyboard = get_inline_keyboard(['Далее'], ['next3'])
                 message_text = self.write_answers(call.from_user.id, 3, int(text))
-                bot.edit_message_text(message_text, call.message.chat.id, call.message.id, reply_markup=keyboard)
+                bot.delete_message(call.message.chat.id, call.message.id)
+                bot.send_message(call.message.chat.id, message_text, reply_markup=keyboard)
 
             elif call.data == 'next3':
                 keyboard = get_inline_keyboard(['10', '17', '15'], [f'var_4_{i}' for i in range(3)])
@@ -319,9 +333,7 @@ class Bot(DbHandler, TeleBot):
                 file = open("static/images/task8.png", "rb")
                 bot.delete_message(call.message.chat.id, call.message.id)
                 self.send_action(call.message.chat.id, bot_chat_actions['photo'])
-                bot.send_photo(call.message.chat.id, file)
-                self.send_action(call.message.chat.id, bot_chat_actions['text'])
-                bot.send_message(call.message.chat.id, "Выиграно у черных или ничья?", reply_markup=keyboard)
+                bot.send_photo(call.message.chat.id, file, "Выиграно у черных или ничья?", reply_markup=keyboard)
             elif 'var_8' in call.data:
                 text = ""
                 for i in range(2):
@@ -329,7 +341,8 @@ class Bot(DbHandler, TeleBot):
                         text = str(i)
                 keyboard = get_inline_keyboard(['Далее'], ['next8'])
                 message_text = self.write_answers(call.from_user.id, 8, int(text))
-                bot.edit_message_text(message_text, call.message.chat.id, call.message.id, reply_markup=keyboard)
+                bot.delete_message(call.message.chat.id, call.message.id)
+                bot.send_message(call.message.chat.id, message_text, reply_markup=keyboard)
 
             elif call.data == 'next8':
                 keyboard = get_inline_keyboard(['Не позднее 600 лет до н.э', '1763', '923'],
@@ -418,12 +431,10 @@ class Bot(DbHandler, TeleBot):
             elif call.data == 'next14':
                 keyboard = get_inline_keyboard(['Qf4', 'Qc7', 'Rc7'], [f'var_015_{i}' for i in range(3)])
                 bot.delete_message(call.message.chat.id, call.message.id)
-                file = open("static/images/task3.jpeg",
+                file = open("static/images/task15.jpg",
                             'rb')
                 self.send_action(call.message.chat.id, bot_chat_actions['photo'], time=2)
-                bot.send_photo(call.message.chat.id, file, "Поставьте мат в один ход")
-                self.send_action(call.message.chat.id, bot_chat_actions['text'], time=2)
-                bot.send_message(call.message.chat.id, "Ваш ответ: ", reply_markup=keyboard)
+                bot.send_photo(call.message.chat.id, file, "Поставьте мат в один ход", reply_markup=keyboard)
             elif 'var_015' in call.data:
                 text = ""
                 for i in range(3):
@@ -431,12 +442,14 @@ class Bot(DbHandler, TeleBot):
                         text = str(i)
                 keyboard = get_inline_keyboard(['Finish'], ['End'])
                 message_text = self.write_answers(call.from_user.id, 15, int(text))
-                bot.edit_message_text(message_text,
-                                      call.message.chat.id, call.message.id, reply_markup=keyboard)
+                bot.delete_message(call.message.chat.id, call.message.id)
+                bot.send_message(call.message.chat.id, message_text, reply_markup=keyboard)
             elif call.data == "End":
                 bot.delete_message(call.message.chat.id, call.message.id)
                 self.send_action(call.message.chat.id, bot_chat_actions['text'])
-                bot.send_message(call.message.chat.id, "Поздравляем с прохождением заданий!")
+                bot.send_message(call.message.chat.id, f"Поздравляем с прохождением заданий!\n"
+                                                       f"{self.get_results(call.from_user.id)} \U0001F607")
+
 
         """
         delete comments when bot will be deploy        
