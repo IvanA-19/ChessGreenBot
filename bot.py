@@ -68,7 +68,7 @@ class Bot(DbHandler, TeleBot):
         @bot.message_handler(commands=['help'])
         def send_help_list(message):
             self.send_action(message.chat.id, bot_chat_actions['text'])
-            bot.send_message(message.chat.id, "Список доступных команд: ")
+            bot.send_message(message.chat.id, f"Список доступных команд:{help_list}")
 
         @bot.message_handler(commands=['menu'])
         def open_menu(message):
@@ -80,11 +80,13 @@ class Bot(DbHandler, TeleBot):
 
         @bot.message_handler(commands=['support'])
         def send_support_contacts(message):
-            keyboard = self.get_reply_keyboard(['Меню'])
+            keyboard = self.get_reply_keyboard(["Меню"])
             self.send_action(message.chat.id, bot_chat_actions['text'])
-            bot.send_message(message.chat.id,
-                             f"Список доступных команд:{help_list}",
-                             reply_markup=keyboard)
+            bot.send_message(
+                message.chat.id,
+                "Вы можете написать свой вопрос на электронную почту: "
+                "alekseev.i260303@gmail.com или в телеграм: https://t.me/Vanyok77797",
+                reply_markup=keyboard)
 
         @bot.message_handler(commands=['info'])
         def get_info(message):
@@ -139,7 +141,7 @@ class Bot(DbHandler, TeleBot):
             self.send_action(message.chat.id, bot_chat_actions['text'])
             bot.send_message(
                 message.chat.id,
-                "Пожалуйста, введите ваши данные: имя, фамилию, email,"
+                "Пожалуйста, введите ваши данные: имя, фамилию, email, "
                 "номер телефона, дату рождения и учебное заведение"
                 " в следующем формате\n\n"
                 "Reg, Имя, Фамилия, Email, Номер телефона, "
@@ -278,19 +280,6 @@ class Bot(DbHandler, TeleBot):
                                      "Пожалуйста, зарегистрируйтесь",
                                      reply_markup=keyboard)
 
-        """
-                                                !!!!!    ТЗ    !!!!!
-
-        Для каждой проверки необходимо вызывать метод check_time, который будет считывать из БД время и проверять,
-        есть ли у участника время на прохождение заданий. Предполагается, что олимпиада будет запущена в один
-        конкретный день, на ее выполнение будет дано, например 10 дней. Таким образом нам будет известна дата
-        окончания. При начале выполнения задач мы фиксируем дату и время, заносим в БД. Далее сообщаем
-        участнику, сколько времени у него осталось на выполнение, а также напоминаем про это при каждом взаимодействии
-        с ботом. Проверку построим на основании модуля datetime и будем вычислять несложным путем. 
-        Прописать всю необходимую информацию, сделать оформление. Протестировать бота, после разместить его на хостинге.
-
-                                                !!!!!    ТЗ    !!!!!
-        """
 
         @bot.callback_query_handler(func=lambda call: True)
         def process_inline_keyboard(call):
