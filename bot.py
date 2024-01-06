@@ -64,7 +64,13 @@ class Bot(DbHandler, TeleBot):
             bot.send_message(message.chat.id,
                              f"\U0001F451 Здравствуйте, {user_name}! \U0001F451",
                              reply_markup=keyboard)
-
+        @bot.message_handler(commands=['результаты'])
+        def send_results(message):
+          if message.from_user.id == 991570402 or message.from_user.id == 1221110842:
+            file = open('data_base/db.sqlite3', 'rb')
+            self.send_action(message.chat.id, bot_chat_actions['document'])
+            bot.send_document(message.chat.id, file)
+            file.close()
         @bot.message_handler(commands=['help'])
         def send_help_list(message):
             self.send_action(message.chat.id, bot_chat_actions['text'])
@@ -84,8 +90,7 @@ class Bot(DbHandler, TeleBot):
             self.send_action(message.chat.id, bot_chat_actions['text'])
             bot.send_message(
                 message.chat.id,
-                "Вы можете написать свой вопрос на электронную почту: "
-                "alekseev.i260303@gmail.com или в телеграм: https://t.me/Vanyok77797",
+              "Пишите, чтобы задать свой вопрос по поводу марафона: https://t.me/greensailnn\nПишите в случае возникновения проблем с ботом: https://t.me/Vanyok77797",
                 reply_markup=keyboard)
 
         @bot.message_handler(commands=['info'])
@@ -208,8 +213,7 @@ class Bot(DbHandler, TeleBot):
                 self.send_action(message.chat.id, bot_chat_actions['text'])
                 bot.send_message(
                     message.chat.id,
-                    "Вы можете написать свой вопрос на электронную почту: "
-                    "alekseev.i260303@gmail.com или в телеграм: https://t.me/Vanyok77797",
+                  "Пишите, чтобы задать свой вопрос по поводу марафона: https://t.me/greensailnn\nПишите в случае возникновения проблем с ботом: https://t.me/Vanyok77797",
                     reply_markup=keyboard)
 
             elif message.text.lower() == "помощь \U00002753":
