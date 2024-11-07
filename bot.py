@@ -21,6 +21,7 @@ class Bot(DbHandler, TeleBot):
         super(Bot, self).__init__()
         self.bot = TeleBot(token, parse_mode='HTML')
         self.bot.set_my_commands(bot_commands)
+        self.create_tables()
 
     def get_reply_keyboard(self,
                            keyboard_buttons: list = None,
