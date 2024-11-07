@@ -64,13 +64,16 @@ class Bot(DbHandler, TeleBot):
             bot.send_message(message.chat.id,
                              f"\U0001F451 Здравствуйте, {user_name}! \U0001F451",
                              reply_markup=keyboard)
+
+        # Указать id пользователей в телеграмм, кто сможет получать результаты
         @bot.message_handler(commands=['результаты'])
         def send_results(message):
-          if message.from_user.id == 991570402 or message.from_user.id == 1221110842:
-            file = open('data_base/db.sqlite3', 'rb')
-            self.send_action(message.chat.id, bot_chat_actions['document'])
-            bot.send_document(message.chat.id, file)
-            file.close()
+            if message.from_user.id == 991570402 or message.from_user.id == 1221110842:
+                file = open('data_base/db.sqlite3', 'rb')
+                self.send_action(message.chat.id, bot_chat_actions['document'])
+                bot.send_document(message.chat.id, file)
+                file.close()
+
         @bot.message_handler(commands=['help'])
         def send_help_list(message):
             self.send_action(message.chat.id, bot_chat_actions['text'])
@@ -90,7 +93,9 @@ class Bot(DbHandler, TeleBot):
             self.send_action(message.chat.id, bot_chat_actions['text'])
             bot.send_message(
                 message.chat.id,
-              "Пишите, чтобы задать свой вопрос по поводу марафона: https://t.me/greensailnn\nПишите в случае возникновения проблем с ботом: https://t.me/Vanyok77797",
+                # Дописать, куда обращаться в случае проблем
+                "Пишите, чтобы задать свой вопрос по поводу марафона: "
+                "https://t.me/greensailnn\nПишите в случае возникновения проблем с ботом: ",
                 reply_markup=keyboard)
 
         @bot.message_handler(commands=['info'])
@@ -158,10 +163,6 @@ class Bot(DbHandler, TeleBot):
             self.send_action(message.chat.id, bot_chat_actions['text'])
             bot.send_message(message.chat.id, "До свидания!", reply_markup=keyboard)
 
-        @bot.message_handler(commands=['time'])
-        def get_time(message):
-            pass
-
         @bot.message_handler(content_types=['text'])
         def check_message(message):
             if message.text.lower() == 'меню':
@@ -213,7 +214,8 @@ class Bot(DbHandler, TeleBot):
                 self.send_action(message.chat.id, bot_chat_actions['text'])
                 bot.send_message(
                     message.chat.id,
-                  "Пишите, чтобы задать свой вопрос по поводу марафона: https://t.me/greensailnn\nПишите в случае возникновения проблем с ботом: https://t.me/Vanyok77797",
+                    "Пишите, чтобы задать свой вопрос по поводу марафона: https://t.me/greensailnn"
+                    "\nПишите в случае возникновения проблем с ботом: https://t.me/Vanyok77797",
                     reply_markup=keyboard)
 
             elif message.text.lower() == "помощь \U00002753":
@@ -248,8 +250,7 @@ class Bot(DbHandler, TeleBot):
 
             elif message.text.lower() == "продолжить":
                 if self.check_task(
-                        message.from_user.id) is not None and self.check_task(
-                    message.from_user.id) - 1 != 0:
+                        message.from_user.id) is not None and self.check_task(message.from_user.id) - 1 != 0:
                     keyboard = get_inline_keyboard(
                         ['Продолжить'],
                         [f'next{self.check_task(message.from_user.id) - 1}'])
@@ -283,7 +284,6 @@ class Bot(DbHandler, TeleBot):
                     bot.send_message(message.chat.id,
                                      "Пожалуйста, зарегистрируйтесь",
                                      reply_markup=keyboard)
-
 
         @bot.callback_query_handler(func=lambda call: True)
         def process_inline_keyboard(call):
